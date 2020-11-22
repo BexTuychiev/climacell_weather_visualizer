@@ -69,6 +69,8 @@ def run_app():
         subset_sorted['lon'] = subset_sorted['lng']
         # Drop lng column
         subset_sorted.drop('lng', axis='columns', inplace=True)
+        # Reorder columns
+        subset_sorted = subset_sorted[['city_ascii', 'lat', 'lon', 'population']]
         return subset_sorted
 
     # Load cities data with locations
@@ -94,7 +96,14 @@ def run_app():
                     st.dataframe(top25(cities, country_input))
                     # TODO
                 else:
-                    st.error('Could not find a match from the database')
+                    st.error('Could not find a match from the database. Try again...')
+    else:
+        # Create a dropdown
+        country_input = st.selectbox('Choose your country',
+                                     sorted([''] + list(cities['country'].unique())))
+        if country_input:
+            st.markdown(f"You chose **{country_input}**")
+            st.dataframe(top25(cities, country_input))
 
 
 if __name__ == '__main__':
