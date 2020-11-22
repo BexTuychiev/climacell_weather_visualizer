@@ -87,7 +87,6 @@ def run_app():
                                        'lon', 'population']]
         return subset_sorted.reset_index().drop('index', axis='columns')
 
-    @st.cache  # TODO remove caching later
     def call_api(cities_df):
         """
         Get current weather data
