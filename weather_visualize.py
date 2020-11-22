@@ -97,6 +97,11 @@ def run_app():
         """
         # Realtime endpoint
         weather_endpoint = "https://api.climacell.co/v3/weather/realtime"
+        # Set the unit
+        if temp_unit == '°C':
+            temp_unit = 'si'
+        else:
+            temp_unit = 'us'
         # Query params
         params = {
             'unit_system': temp_unit,
