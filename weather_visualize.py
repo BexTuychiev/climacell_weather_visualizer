@@ -1,10 +1,18 @@
+# Streamlit framework
 import streamlit as st
+# Scientific libs
 import numpy as np
 import pandas as pd
+# Base libs
 import time
-import datetime
+from datetime import datetime, timedelta
 from PIL import Image
+import os
+import json
+# String matching
 from fuzzywuzzy import process
+# API, web
+import requests
 
 
 def main():
@@ -70,15 +78,54 @@ def run_app():
         # Drop lng column
         subset_sorted.drop('lng', axis='columns', inplace=True)
         # Reorder columns
-        subset_sorted = subset_sorted[['city_ascii', 'lat', 'lon', 'population']]
-        return subset_sorted
+        subset_sorted = subset_sorted[['city_ascii', 'lat',
+                                       'lon', 'population']]
+        return subset_sorted.reset_index().drop('index', axis='columns')
+
+    def call_api(cities_df):
+        """
+        Get current weather data
+        for top25 cities from cities_df
+        based on lat/lon
+        :param cities_df: pandas.DataFrame with cities sorted by pop
+        :return:
+        """
+        # Realtime endpoint
+        weather_endpoint = "https://api.climacell.co/v3/weather/realtime"
+        # Query params
+        params = {
+            'unit_system': 'si',  # TODO change unit system to dynamic
+            'fields': 'temp',
+            'apikey': os.environ['CLIMACELL_API'], # TODO dynamic api input
+            'lat': '',
+            'lon': ''
+        }
+        # Get time for the moment
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        def call(row):
+            """
+            Function to return realtime temperature
+            for each lat, lon
+            """
+            # Build querystring params
+            params['lat'] = str(row['lat'])
+            params['lon'] = str(row['lon'])
+            # Make an API call
+            response = requests.request("GET", weather_endpoint, params=params)
+            response = json.loads(response.content)
+            # Update row
+            return response['temp']['value']
+        # Call for API for each row
+        cities_df[f'temp({now})'] = cities_df.apply(call, axis=1)
+        return cities_df
 
     # Load cities data with locations
     cities = load_data('data/worldcities.csv')
 
     # Set a title
     st.title('Visualize Weather Patterns')
-    # Create radio options for input location
+    # Create radio options for location input
     st.subheader('Choose the option to input location:')
     action = st.radio('',
                       ['Custom Country Input', 'Choose From Dropdown'])
@@ -103,7 +150,9 @@ def run_app():
                                      sorted([''] + list(cities['country'].unique())))
         if country_input:
             st.markdown(f"You chose **{country_input}**")
-            st.dataframe(top25(cities, country_input))
+            top_cities = top25(cities, country_input)
+            st.dataframe(call_api(cities_df=top_cities))
+            # TODO
 
 
 if __name__ == '__main__':
