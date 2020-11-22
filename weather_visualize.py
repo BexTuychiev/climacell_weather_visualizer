@@ -174,6 +174,7 @@ def run_app():
                     top_cities = top25(cities, country_input)
                     st.dataframe(call_api(cities_df=top_cities))
                 with st.spinner("Little more... Plotting the results..."):
+                    st.subheader('Hover over the points to see temperatures')
                     st.plotly_chart(map_plot(top_cities, country_input))
             else:
                 st.error('Could not find a match from the database. Try again...')
@@ -187,6 +188,7 @@ def run_app():
                 top_cities = top25(cities, country_input)
                 st.dataframe(call_api(cities_df=top_cities))
             with st.spinner("Little more... Plotting the results..."):
+                st.subheader('Hover over the points to see temperatures')
                 st.plotly_chart(map_plot(top_cities, country_input))
 
 
