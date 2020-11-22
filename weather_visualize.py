@@ -59,7 +59,6 @@ def run_app():
         else:
             return 'No match'
 
-    @st.cache
     def top25(df, country):
         """
         Subset for the top <25
@@ -144,7 +143,7 @@ def run_app():
         # Construct the figure
         fig = px.scatter_mapbox(df, hover_data=['temperature'],
                                 lat='lat', lon='lon',
-                                color='temperature',
+                                color='temperature', size='temperature',
                                 color_continuous_scale=px.colors.cyclical.IceFire,
                                 zoom=5)
         fig.update_traces(textposition='top center')
