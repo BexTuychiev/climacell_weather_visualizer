@@ -121,14 +121,18 @@ def run_app():
                 # Update row
                 return round(float(response['temp']['value']), 1)
             else:
-                response = 'too many calls'
+                response = '<400>'
                 return response
 
         # Call for API for each row
         cities_df['temperature'] = cities_df.apply(call, axis=1)
         if 'population' in cities_df.columns:
             cities_df.drop('population', axis=True, inplace=True)
-        return cities_df
+        # Check for status code
+        if '<400>' in cities_df['temperature']:
+            return 400, None
+        else:
+            return 200, cities_df
 
     def map_plot(df, country):
         """
