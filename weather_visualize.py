@@ -119,11 +119,11 @@ def run_app():
             response = requests.request("GET", weather_endpoint, params=params)
             if response.status_code == 200:
                 response = json.loads(response.content)
+                # Update row
                 return round(float(response['temp']['value']), 1)
             else:
                 response = 'too many calls'
                 return response
-            # Update row
 
         # Call for API for each row
         cities_df['temperature'] = cities_df.apply(call, axis=1)
@@ -174,6 +174,7 @@ def run_app():
                 with st.spinner('Hang on... Fetching realtime temperatures...'):
                     top_cities = top25(cities, country_input)
                     st.dataframe(call_api(cities_df=top_cities))
+                with st.spinner("Little more... Plotting the results..."):
                     st.plotly_chart(map_plot(top_cities, country_input))
             else:
                 st.error('Could not find a match from the database. Try again...')
@@ -186,7 +187,8 @@ def run_app():
             with st.spinner('Hang on... Fetching realtime temperatures...'):
                 top_cities = top25(cities, country_input)
                 st.dataframe(call_api(cities_df=top_cities))
-                # TODO add visualizer
+            with st.spinner("Little more... Plotting the results..."):
+                st.plotly_chart(map_plot(top_cities, country_input))
 
 
 if __name__ == '__main__':
