@@ -129,7 +129,7 @@ def run_app():
         if 'population' in cities_df.columns:
             cities_df.drop('population', axis=True, inplace=True)
         # Check for status code
-        if '<400>' in cities_df['temperature']:
+        if '<400>' in list(cities_df['temperature']):
             return 400, None
         else:
             return 200, cities_df
@@ -178,10 +178,14 @@ def run_app():
                 st.markdown(f"Matched **{country_input}**")
                 with st.spinner('Hang on... Fetching realtime temperatures...'):
                     top_cities = top25(cities, country_input)
-                    st.dataframe(call_api(cities_df=top_cities, temp_unit=unit))
-                with st.spinner("Little more... Plotting the results..."):
-                    st.subheader('Hover over the points to see temperatures')
-                    st.plotly_chart(map_plot(top_cities, country_input))
+                    status, temperatures = call_api(cities_df=top_cities, temp_unit=unit)
+                if status == 200:
+                    st.dataframe(temperatures)
+                    with st.spinner("Little more... Plotting the results..."):
+                        st.subheader('Hover over the points to see temperatures')
+                        st.plotly_chart(map_plot(top_cities, country_input))
+                else:
+                    st.error('Too many requests. Please try again in an hour')
             else:
                 st.error('Could not find a match from the database. Try again...')
     else:
@@ -192,10 +196,14 @@ def run_app():
             st.markdown(f"You chose **{country_input}**")
             with st.spinner('Hang on... Fetching realtime temperatures...'):
                 top_cities = top25(cities, country_input)
-                st.dataframe(call_api(cities_df=top_cities, temp_unit=unit))
-            with st.spinner("Little more... Plotting the results..."):
-                st.subheader('Hover over the points to see temperatures')
-                st.plotly_chart(map_plot(top_cities, country_input))
+                status, temperatures = call_api(cities_df=top_cities, temp_unit=unit)
+            if status == 200:
+                st.dataframe(temperatures)
+                with st.spinner("Little more... Plotting the results..."):
+                    st.subheader('Hover over the points to see temperatures')
+                    st.plotly_chart(map_plot(top_cities, country_input))
+            else:
+                st.error('Too many requests. Please try again in an hour')
 
 
 if __name__ == '__main__':
