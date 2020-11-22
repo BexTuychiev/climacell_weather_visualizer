@@ -126,7 +126,8 @@ def run_app():
 
         # Call for API for each row
         cities_df['temperature'] = cities_df.apply(call, axis=1)
-        cities_df.drop('population', axis=True, inplace=True)
+        if 'population' in cities_df.columns:
+            cities_df.drop('population', axis=True, inplace=True)
         return cities_df
 
     def map_plot(df, country):
