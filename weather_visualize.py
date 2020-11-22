@@ -4,9 +4,28 @@ import pandas as pd
 import time
 import datetime
 from PIL import Image
+from fuzzywuzzy import process
 
-# Set a title to the project
-st.title("Visualize Weather")
-# Set a preview image
-image = Image.open('images/weather.jpg')
-st.image(image, caption="Photo by Quang Nguyen Vinh from Pexels", use_column_width=True)
+
+def main():
+    run_app()
+
+
+def run_app():
+
+    # Set a title
+    st.title('Visualize Weather Patterns')
+    # Create radio options for input location
+    st.subheader('Choose the option to input location:')
+    action = st.radio('',
+                      ['Custom Country Input', 'Choose From Dropdown'])
+
+    # Depending on action
+    # if action == 'Custom Country Input':
+    #     country_input = st.text_input('Enter country (String matching '
+    #                                   'is enabled under the hood):', max_chars=60)
+    #     with st.spinner('Matching the closest country name'):
+
+
+if __name__ == '__main__':
+    main()
