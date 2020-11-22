@@ -48,8 +48,6 @@ def run_app():
                 result = m[0]
         if result:
             return result
-        else:
-            st.error('Could not match any countries. Please check the input')
 
     # Load cities data with locations
     cities = load_data('data/worldcities.csv')
@@ -61,14 +59,15 @@ def run_app():
     action = st.radio('',
                       ['Custom Country Input', 'Choose From Dropdown'])
 
-    # # Depending on action
-    # if action == 'Custom Country Input':
-    #     country_input = st.text_input('Enter country (String matching '
-    #                                   'is enabled under the hood):', max_chars=60)
-    #     with st.spinner('Matching the closest country name'):
-    #         # Match the input to existing countries
-    #         country_input = match_country(country_input)
-    #
+    # Depending on action
+    if action == 'Custom Country Input':
+        country_input = st.text_input('Enter country (String matching '
+                                      'is enabled under the hood):', max_chars=60)
+        with st.spinner('Matching the closest country name'):
+            # Match the input to existing countries
+            country_input = match_country(country_input, cities)
+            if country_input:
+                st.text(country_input)
 
 
 if __name__ == '__main__':
