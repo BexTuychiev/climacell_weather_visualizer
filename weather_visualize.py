@@ -82,6 +82,7 @@ def run_app():
                                        'lon', 'population']]
         return subset_sorted.reset_index().drop('index', axis='columns')
 
+    @st.cache  # TODO remove caching later
     def call_api(cities_df):
         """
         Get current weather data
@@ -116,6 +117,7 @@ def run_app():
             response = json.loads(response.content)
             # Update row
             return round(float(response['temp']['value']), 1)
+
         # Call for API for each row
         cities_df[f'temp({now})'] = cities_df.apply(call, axis=1)
         cities_df.drop('population', axis=True, inplace=True)
