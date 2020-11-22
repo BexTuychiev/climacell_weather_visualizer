@@ -106,8 +106,6 @@ def run_app():
             'lat': '',
             'lon': ''
         }
-        # Get time for the moment
-        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         def call(row):
             """
@@ -124,26 +122,29 @@ def run_app():
             return round(float(response['temp']['value']), 1)
 
         # Call for API for each row
-        cities_df[f'temp({now})'] = cities_df.apply(call, axis=1)
+        cities_df['temperature'] = cities_df.apply(call, axis=1)
         cities_df.drop('population', axis=True, inplace=True)
         return cities_df
 
-    def map_plot(df):
+    def map_plot(df, country):
         """
         A function to plot a scatter_mapbox
         of plotly
+        :param country: a country input by user
         :param df: pandas.DataFrame containing temperature
                    and cities data
         :return: plotly figure
         """
+        # Get time for the moment
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         # Construct the figure
-        fig = px.scatter_mapbox(df, hover_data=['temp'],
+        fig = px.scatter_mapbox(df, hover_data=['temperature'],
                                 lat='lat', lon='lon',
-                                color='temp', size='temp',
+                                color='temperature',
                                 color_continuous_scale=px.colors.cyclical.IceFire,
                                 zoom=5)
         fig.update_traces(textposition='top center')
-        fig.update_layout(title_text='', title_x=0.5)
+        fig.update_layout(title_text=f'Temperatures for {now}, {country.title()}', title_x=0.5)
 
         return fig
 
@@ -169,7 +170,7 @@ def run_app():
                 with st.spinner('Hang on... Fetching realtime temperatures...'):
                     top_cities = top25(cities, country_input)
                     st.dataframe(call_api(cities_df=top_cities))
-                    st.plotly_chart(map_plot(top_cities))
+                    st.plotly_chart(map_plot(top_cities, country_input))
             else:
                 st.error('Could not find a match from the database. Try again...')
     else:
