@@ -96,7 +96,7 @@ def run_app():
         params = {
             'unit_system': 'si',  # TODO change unit system to dynamic
             'fields': 'temp',
-            'apikey': os.environ['CLIMACELL_API'], # TODO dynamic api input
+            'apikey': os.environ['CLIMACELL_API'],  # TODO dynamic api input
             'lat': '',
             'lon': ''
         }
@@ -115,9 +115,10 @@ def run_app():
             response = requests.request("GET", weather_endpoint, params=params)
             response = json.loads(response.content)
             # Update row
-            return response['temp']['value']
+            return round(float(response['temp']['value']), 1)
         # Call for API for each row
         cities_df[f'temp({now})'] = cities_df.apply(call, axis=1)
+        cities_df.drop('population', axis=True, inplace=True)
         return cities_df
 
     # Load cities data with locations
@@ -135,24 +136,26 @@ def run_app():
         user_input = st.text_input('Enter country (basic string matching '
                                    'is enabled under the hood):', max_chars=60)
         if user_input:
-            with st.spinner('Matching the closest country name'):
-                # Match the input to existing countries
-                country_input = match_country(user_input, cities)
-                if country_input != 'No match':
-                    st.markdown(f"Matched **{country_input}**")
-                    st.dataframe(top25(cities, country_input))
-                    # TODO
-                else:
-                    st.error('Could not find a match from the database. Try again...')
+            # Match the input to existing countries
+            country_input = match_country(user_input, cities)
+            if country_input != 'No match':
+                st.markdown(f"Matched **{country_input}**")
+                with st.spinner('Hang on... Fetching realtime temperatures...'):
+                    top_cities = top25(cities, country_input)
+                    st.dataframe(call_api(cities_df=top_cities))
+                    # TODO add visualizer
+            else:
+                st.error('Could not find a match from the database. Try again...')
     else:
         # Create a dropdown
         country_input = st.selectbox('Choose your country',
                                      sorted([''] + list(cities['country'].unique())))
         if country_input:
             st.markdown(f"You chose **{country_input}**")
-            top_cities = top25(cities, country_input)
-            st.dataframe(call_api(cities_df=top_cities))
-            # TODO
+            with st.spinner('Hang on... Fetching realtime temperatures...'):
+                top_cities = top25(cities, country_input)
+                st.dataframe(call_api(cities_df=top_cities))
+                # TODO add visualizer
 
 
 if __name__ == '__main__':
