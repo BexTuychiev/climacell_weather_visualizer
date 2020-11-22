@@ -117,9 +117,13 @@ def run_app():
             params['lon'] = str(row['lon'])
             # Make an API call
             response = requests.request("GET", weather_endpoint, params=params)
-            response = json.loads(response.content)
+            if response.status_code == 200:
+                response = json.loads(response.content)
+                return round(float(response['temp']['value']), 1)
+            else:
+                response = 'too many calls'
+                return response
             # Update row
-            return round(float(response['temp']['value']), 1)
 
         # Call for API for each row
         cities_df['temperature'] = cities_df.apply(call, axis=1)
