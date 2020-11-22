@@ -13,6 +13,11 @@ import json
 from fuzzywuzzy import process
 # API, web
 import requests
+# Visualization
+import plotly.express as px
+
+# Set Mapbox Token
+px.set_mapbox_access_token(os.environ['MAPBOX_TOKEN'])
 
 
 def main():
@@ -123,6 +128,25 @@ def run_app():
         cities_df.drop('population', axis=True, inplace=True)
         return cities_df
 
+    def map_plot(df):
+        """
+        A function to plot a scatter_mapbox
+        of plotly
+        :param df: pandas.DataFrame containing temperature
+                   and cities data
+        :return: plotly figure
+        """
+        # Construct the figure
+        fig = px.scatter_mapbox(df, hover_data=['temp'],
+                                lat='lat', lon='lon',
+                                color='temp', size='temp',
+                                color_continuous_scale=px.colors.cyclical.IceFire,
+                                zoom=5)
+        fig.update_traces(textposition='top center')
+        fig.update_layout(title_text='', title_x=0.5)
+
+        return fig
+
     # Load cities data with locations
     cities = load_data('data/worldcities.csv')
 
@@ -145,7 +169,7 @@ def run_app():
                 with st.spinner('Hang on... Fetching realtime temperatures...'):
                     top_cities = top25(cities, country_input)
                     st.dataframe(call_api(cities_df=top_cities))
-                    # TODO add visualizer
+                    st.plotly_chart(map_plot(top_cities))
             else:
                 st.error('Could not find a match from the database. Try again...')
     else:
