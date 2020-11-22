@@ -44,7 +44,7 @@ def run_app():
         # for each match
         for m in matches:
             # If similarity higher than 85
-            if m[1] >= 85:
+            if m[1] >= 80:
                 result = m[0]
         if result:
             return result
@@ -61,13 +61,15 @@ def run_app():
 
     # Depending on action
     if action == 'Custom Country Input':
-        country_input = st.text_input('Enter country (String matching '
+        country_input = st.text_input('Enter country (basic string matching '
                                       'is enabled under the hood):', max_chars=60)
         with st.spinner('Matching the closest country name'):
             # Match the input to existing countries
             country_input = match_country(country_input, cities)
-            if country_input:
-                st.text(country_input)
+            # if country_input:
+            #     st.text('You chose: ' + country_input)
+            # else:
+            #     st.error('Could not find a match from the database')
 
 
 if __name__ == '__main__':
