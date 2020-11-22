@@ -39,17 +39,37 @@ def run_app():
         # Store unique country names
         unique_countries = set(df['country'].unique())
         # Find all matches for user_input
-        matches = process.extract(custom_input, unique_countries, limit=len(unique_countries))
-        result = None
-        # for each match
-        for m in matches:
-            # If similarity higher than 85
-            if m[1] >= 80:
-                result = m[0]
-        if result:
-            return result
+        match = process.extractOne(custom_input, unique_countries)
+        # If similarity is over 70
+        if match[1] >= 80:
+            return match[0]
         else:
             return 'No match'
+
+    @st.cache
+    def top25(df, country):
+        """
+        Subset for the top <25
+        cities of the given country
+        :param df: a dataset containing coords
+                   for cities and countries
+        :param country: a country matched from
+                        user input
+        :return: pandas.DataFrame containing
+                 coords for top 25 cities
+                 of given country
+        """
+        # Subset for cities of given country
+        subset = df[df['country'] == country][['city_ascii', 'lat',
+                                               'lng', 'population']]
+        # Extract top 25 based on population size
+        subset_sorted = subset.sort_values('population',
+                                           ascending=False).iloc[:25]
+        # Rename lng column to lon
+        subset_sorted['lon'] = subset_sorted['lng']
+        # Drop lng column
+        subset_sorted.drop('lng', axis='columns', inplace=True)
+        return subset_sorted
 
     # Load cities data with locations
     cities = load_data('data/worldcities.csv')
@@ -70,7 +90,8 @@ def run_app():
                 # Match the input to existing countries
                 country_input = match_country(user_input, cities)
                 if country_input != 'No match':
-                    st.text('You chose: ' + country_input)
+                    st.markdown(f"Matched **{country_input}**")
+                    st.dataframe(top25(cities, country_input))
                     # TODO
                 else:
                     st.error('Could not find a match from the database')
