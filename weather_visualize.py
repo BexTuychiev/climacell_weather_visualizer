@@ -28,18 +28,18 @@ def run_app():
         return df
 
     @st.cache
-    def match_country(user_input, df):
+    def match_country(custom_input, df):
         """
         Match user input to available
         countries in the
-        :param user_input: text input for country
+        :param custom_input: text input for country
         :param df: main data
         :return: matching country as str
         """
         # Store unique country names
         unique_countries = set(df['country'].unique())
         # Find all matches for user_input
-        matches = process.extract(user_input, unique_countries, limit=len(unique_countries))
+        matches = process.extract(custom_input, unique_countries, limit=len(unique_countries))
         result = None
         # for each match
         for m in matches:
@@ -71,6 +71,7 @@ def run_app():
                 country_input = match_country(user_input, cities)
                 if country_input != 'No match':
                     st.text('You chose: ' + country_input)
+                    # TODO
                 else:
                     st.error('Could not find a match from the database')
 
