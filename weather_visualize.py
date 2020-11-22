@@ -86,11 +86,12 @@ def run_app():
                                        'lon', 'population']]
         return subset_sorted.reset_index().drop('index', axis='columns')
 
-    def call_api(cities_df):
+    def call_api(cities_df, temp_unit):
         """
         Get current weather data
         for top25 cities from cities_df
         based on lat/lon
+        :param temp_unit: value got from the user input radio btns
         :param cities_df: pandas.DataFrame with cities sorted by pop
         :return:
         """
@@ -98,7 +99,7 @@ def run_app():
         weather_endpoint = "https://api.climacell.co/v3/weather/realtime"
         # Query params
         params = {
-            'unit_system': 'si',  # TODO change unit system to dynamic
+            'unit_system': temp_unit,
             'fields': 'temp',
             'apikey': os.environ['CLIMACELL_API'],  # TODO dynamic api input
             'lat': '',
@@ -160,7 +161,8 @@ def run_app():
     st.subheader('Choose the option to input location:')
     action = st.radio('',
                       ['Custom Country Input', 'Choose From Dropdown'])
-
+    unit = st.radio('Choose the unit for temperature:',
+                    ['°C', '°F'])
     # Depending on action
     if action == 'Custom Country Input':
         user_input = st.text_input('Enter country (basic string matching '
@@ -172,7 +174,7 @@ def run_app():
                 st.markdown(f"Matched **{country_input}**")
                 with st.spinner('Hang on... Fetching realtime temperatures...'):
                     top_cities = top25(cities, country_input)
-                    st.dataframe(call_api(cities_df=top_cities))
+                    st.dataframe(call_api(cities_df=top_cities, temp_unit=unit))
                 with st.spinner("Little more... Plotting the results..."):
                     st.subheader('Hover over the points to see temperatures')
                     st.plotly_chart(map_plot(top_cities, country_input))
@@ -186,7 +188,7 @@ def run_app():
             st.markdown(f"You chose **{country_input}**")
             with st.spinner('Hang on... Fetching realtime temperatures...'):
                 top_cities = top25(cities, country_input)
-                st.dataframe(call_api(cities_df=top_cities))
+                st.dataframe(call_api(cities_df=top_cities, temp_unit=unit))
             with st.spinner("Little more... Plotting the results..."):
                 st.subheader('Hover over the points to see temperatures')
                 st.plotly_chart(map_plot(top_cities, country_input))
