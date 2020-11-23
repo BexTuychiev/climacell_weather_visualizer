@@ -131,6 +131,8 @@ def run_app():
 
         # Call for API for each row
         cities_df['temperature'] = cities_df.apply(call, axis=1)
+        # Create a column to resize the scatter plot dots
+        cities_df['size'] = 15
         if 'population' in cities_df.columns:
             cities_df.drop('population', axis=True, inplace=True)
         # Check for status code
@@ -153,7 +155,7 @@ def run_app():
         # Construct the figure
         fig = px.scatter_mapbox(df, hover_data=['temperature'],
                                 lat='lat', lon='lon',
-                                color='temperature', size='temperature',
+                                color='temperature', size='size',
                                 color_continuous_scale=px.colors.cyclical.IceFire,
                                 zoom=5)
         fig.update_traces(textposition='top center')
@@ -185,7 +187,7 @@ def run_app():
                     top_cities = top25(cities, country_input)
                     status, temperatures = call_api(cities_df=top_cities, temp_unit=unit)
                 if status == 200:
-                    st.dataframe(temperatures)
+                    st.dataframe(temperatures.drop('size', axis=1))
                     with st.spinner("Little more... Plotting the results..."):
                         st.subheader('Hover over the points to see temperatures')
                         st.plotly_chart(map_plot(top_cities, country_input))
@@ -203,7 +205,7 @@ def run_app():
                 top_cities = top25(cities, country_input)
                 status, temperatures = call_api(cities_df=top_cities, temp_unit=unit)
             if status == 200:
-                st.dataframe(temperatures)
+                st.dataframe(temperatures.drop('size', axis=1))
                 with st.spinner("Little more... Plotting the results..."):
                     st.subheader('Hover over the points to see temperatures')
                     st.plotly_chart(map_plot(top_cities, country_input))
