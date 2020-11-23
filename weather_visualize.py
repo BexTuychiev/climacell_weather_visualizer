@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from PIL import Image
 import os
 import json
+from copy import deepcopy
 # String matching
 from fuzzywuzzy import process
 # API, web
@@ -34,24 +35,31 @@ def main():
         'Source code'
     ])
     # Create an input field for user's API
-    api = st.sidebar.text_input('Please enter your Climacell API:', max_chars=32,
-                                type='password')
-    api_placeholder = st.sidebar.markdown("<small>If you don't have one, get it "
-                                          "[here](https://developer.climacell.co/sign-up). It is free."
-                                          "</small>",
-                                          unsafe_allow_html=True)
+    placeholder = st.sidebar.empty()
+    message_placeholder = st.empty()
+    api_key = placeholder.text_input('Please enter your Climacell API:', max_chars=32,
+                                     type='password')
+    info = st.sidebar.markdown("<small>If you don't have one, get it "
+                               "[here](https://developer.climacell.co/sign-up). It is free."
+                               "</small>",
+                               unsafe_allow_html=True)
+    validated = False
+    if api_key:
+        api = deepcopy(api_key)
+        with st.spinner('Validating your API key...'):
+            while not validated:
+                b = validate_api(api)
+                if b:
+                    message_placeholder.success('Validated!')
+                    validated = True
+                    placeholder.empty()
+                    info.empty()
+                    time.sleep(2)
+                    message_placeholder.empty()
+                else:
+                    message_placeholder.error('Invalid key... Please try again!')
+                    break
 
-    # not_valid = True
-    # while not_valid:
-    #     if api:  # If api is given, empty the instructions
-    #         print(api)
-    #         api_placeholder.empty()
-    #         with st.spinner('Validating your API key, little patience...'):
-    #             if validate_api(api):
-    #                 not_valid = False
-    #                 st.success('Your key is valid! Choose the \'Run app\' mode to get started')
-    #             else:
-    #                 st.error('Validation failed! Please provide a valid API key...')
     if mode == 'Instructions and code explanation':
         pass
     elif mode == 'Run the app':
@@ -85,7 +93,6 @@ def run_app(api):
     the main part of the program
     """
 
-    @st.cache
     def load_data(path):
         """
         A function load data
@@ -95,7 +102,6 @@ def run_app(api):
         df = pd.read_csv(path)
         return df
 
-    @st.cache
     def match_country(custom_input, df):
         """
         Match user input to available
