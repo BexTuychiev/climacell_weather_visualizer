@@ -22,7 +22,28 @@ px.set_mapbox_access_token(os.environ['MAPBOX_TOKEN'])
 
 # Wrapper function around the main functions with behind logic
 def main():
-    run_app()
+    # Create a dropdown for app mode
+    st.sidebar.markdown("""
+        <h2>Choose the mode:</h2>    
+    """, unsafe_allow_html=True)
+    mode = st.sidebar.selectbox('', [
+        'Instructions',
+        'Run the app',
+        'Source code'
+    ])
+    # Create an input field for user's API
+    api = st.sidebar.text_input('Please enter your Climacell API:', max_chars=32,
+                                type='password')
+    st.sidebar.markdown("<small>If you don't have one, get it "
+                        "[here](https://developer.climacell.co/sign-up). It is free."
+                        "</small>",
+                        unsafe_allow_html=True)
+    if mode == 'Instructions':
+        pass
+    elif mode == 'Run the app':
+        run_app()
+    else:
+        pass
 
 
 def run_app():
