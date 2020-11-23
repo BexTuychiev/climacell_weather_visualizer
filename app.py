@@ -277,7 +277,7 @@ def run_app():
         # If both fields are filled
         if latitude and longitude:
             # Call API and store as a single df
-            temp_df = make_req(latitude, longitude, {'°C': 'us', '°F': 'si'}[unit])
+            temp_df = make_req(latitude, longitude, {'°C': 'si', '°F': 'us'}[unit])
             # Plot a single point
             plot = plot_single(temp_df)
             # Display dataframe too
