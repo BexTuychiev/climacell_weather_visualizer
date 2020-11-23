@@ -20,6 +20,7 @@ import plotly.express as px
 px.set_mapbox_access_token(os.environ['MAPBOX_TOKEN'])
 
 
+# Wrapper function around the main functions with behind logic
 def main():
     run_app()
 
@@ -150,6 +151,14 @@ def run_app():
                    and cities data
         :return: plotly figure
         """
+        # Change the zoom level according to the shape of df
+        size = df.shape[0]
+        if size == 25:
+            zoom = 3
+        elif size == 20:
+            zoom = 4
+        else:
+            zoom = 5
         # Get time for the moment
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         # Construct the figure
@@ -157,7 +166,7 @@ def run_app():
                                 lat='lat', lon='lon',
                                 color='temperature', size='size',
                                 color_continuous_scale=px.colors.cyclical.IceFire,
-                                zoom=5)
+                                zoom=zoom)
         fig.update_traces(textposition='top center')
         fig.update_layout(title_text=f'Temperatures for {now}, {country.title()}', title_x=0.5)
 
