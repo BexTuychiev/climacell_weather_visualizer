@@ -79,7 +79,20 @@ def main():
     elif mode == 'Run the app':
         run_app()
     else:
-        pass  # TODO create a function to show source code
+        def get_file_content_as_string(path):
+            """
+            A function to download files
+            from github repo using path
+            :param path: path to the file
+            :return: file object
+
+            Implemented from demo Streamlit project:
+            https://share.streamlit.io/streamlit/demo-self-driving
+            """
+            with open(path, 'rb') as file:
+                data = file.read().decode('utf-8')
+            return data
+        st.code(get_file_content_as_string('app.py'))
 
 
 def validate_api(api):
