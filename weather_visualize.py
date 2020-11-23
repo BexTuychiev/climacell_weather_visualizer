@@ -207,7 +207,7 @@ def run_app():
                     # Create a waiting event while plotting
                     with st.spinner("Little more... Plotting the results..."):
                         # Inform the user to hover over points
-                        st.subheader('Hover over the points to see temperatures')
+                        st.subheader('Hover over the points and drag around to see temperatures')
                         # Display the plotly chart using returned data
                         st.plotly_chart(map_plot(top_cities, country_input))
                 else:  # if status code != 200, it means too many requests
