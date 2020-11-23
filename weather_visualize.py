@@ -181,35 +181,55 @@ def run_app():
         if user_input:
             # Match the input to existing countries
             country_input = match_country(user_input, cities)
+            # If country matches
             if country_input != 'No match':
+                # Inform the user about their option
                 st.markdown(f"Matched **{country_input}**")
+                # Create waiting event while getting temp data from API
                 with st.spinner('Hang on... Fetching realtime temperatures...'):
+                    # Subset for top <=25 cities of the country choice
                     top_cities = top25(cities, country_input)
+                    # Store results of API call
                     status, temperatures = call_api(cities_df=top_cities, temp_unit=unit)
+                # If request successful
                 if status == 200:
+                    # Show dataframe
                     st.dataframe(temperatures.drop('size', axis=1))
+                    # Create a waiting event while plotting
                     with st.spinner("Little more... Plotting the results..."):
+                        # Inform the user to hover over points
                         st.subheader('Hover over the points to see temperatures')
+                        # Display the plotly chart using returned data
                         st.plotly_chart(map_plot(top_cities, country_input))
-                else:
+                else:  # if status code != 200, it means too many requests
                     st.error('Too many requests. Please try again in an hour')
-            else:
+            else:  # if country_input == 'No match'
                 st.error('Could not find a match from the database. Try again...')
-    else:
+    else:  # If user chooses to input via dropdown
         # Create a dropdown
         country_input = st.selectbox('Choose your country',
                                      sorted([''] + list(cities['country'].unique())))
+        # If user choose a country from dropdown
         if country_input:
+            # Inform the user about their option
             st.markdown(f"You chose **{country_input}**")
+            # Create waiting event while getting temp data from API
             with st.spinner('Hang on... Fetching realtime temperatures...'):
+                # Subset for top <=25 cities of the country choice
                 top_cities = top25(cities, country_input)
+                # Store results of API call
                 status, temperatures = call_api(cities_df=top_cities, temp_unit=unit)
+            # If request successful
             if status == 200:
+                # Show dataframe
                 st.dataframe(temperatures.drop('size', axis=1))
+                # Create a waiting event while plotting
                 with st.spinner("Little more... Plotting the results..."):
+                    # Inform the user to hover over points
                     st.subheader('Hover over the points to see temperatures')
+                    # Display the plotly chart using returned data
                     st.plotly_chart(map_plot(top_cities, country_input))
-            else:
+            else:  # if status code != 200, it means too many requests
                 st.error('Too many requests. Please try again in an hour')
 
 
