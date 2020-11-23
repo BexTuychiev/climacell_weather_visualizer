@@ -232,6 +232,25 @@ def run_app():
         df = pd.DataFrame(df_dict, index=[0])
         return df
 
+    def plot_single(df):
+        """
+        Vanilla function to
+        plot scatter_mapbox based on single
+        location
+        """
+        # Get time for the moment
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        # Construct the figure
+        fig = px.scatter_mapbox(df, hover_data=['Temperature'],
+                                lat='lat', lon='lon',
+                                size='size',
+                                color_continuous_scale=px.colors.cyclical.IceFire,
+                                zoom=14)
+        fig.update_traces(textposition='top center')
+        fig.update_layout(title_text=f'Temperatures for {now}, at ({df["lat"][0]}, {df["lon"][0]})', title_x=0.5)
+
+        return fig
+
     # Load cities data with locations
     cities = load_data('data/worldcities.csv')
 
