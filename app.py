@@ -280,6 +280,8 @@ def run_app():
             temp_df = make_req(latitude, longitude, {'°C': 'us', '°F': 'si'}[unit])
             # Plot a single point
             plot = plot_single(temp_df)
+            # Display dataframe too
+            st.table(temp_df[['lat', 'lon', 'Temperature']])
             # Display as plotly chart
             st.plotly_chart(plot)
     elif action == 'Custom Country Input':
