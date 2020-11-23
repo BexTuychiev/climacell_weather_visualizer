@@ -18,9 +18,7 @@ import requests
 import plotly.express as px
 
 # Set Mapbox Token
-px.set_mapbox_access_token(
-    'pk.eyJ1IjoiaWJleG9yaWdpbiIsImEiOiJja2h0Mjc3ZHc'
-    'wNmp3MnNwNTloYTJsbHpwIn0.uXZfhBAuZ5IrutGIRMwDsw')
+px.set_mapbox_access_token(os.environ['MAPBOX_TOKEN'])
 
 
 # Wrapper function around the main functions with behind logic
@@ -34,36 +32,13 @@ def main():
         'Run the app',
         'Source code'
     ])
-    # Create an input field for user's API
-    placeholder = st.sidebar.empty()
-    message_placeholder = st.empty()
-    api_key = placeholder.text_input('Please enter your Climacell API:', max_chars=32,
-                                     type='password')
-    info = st.sidebar.markdown("<small>If you don't have one, get it "
-                               "[here](https://developer.climacell.co/sign-up). It is free."
-                               "</small>",
-                               unsafe_allow_html=True)
-    validated = False
-    if api_key:
-        api = deepcopy(api_key)
-        with st.spinner('Validating your API key...'):
-            while not validated:
-                b = validate_api(api)
-                if b:
-                    message_placeholder.success('Validated!')
-                    validated = True
-                    placeholder.empty()
-                    info.empty()
-                    time.sleep(2)
-                    message_placeholder.empty()
-                else:
-                    message_placeholder.error('Invalid key... Please try again!')
-                    break
-
     if mode == 'Instructions and code explanation':
-        pass
+        st.title('Visualize Weather Patterns Using Climacell')
+        image = Image.open('images/weather.jpg')
+        st.image(image, use_column_width=True,
+                 caption='Picture by Quang Nguyen Vinh on Pexels')
     elif mode == 'Run the app':
-        run_app(api)
+        run_app()
     else:
         pass  # TODO create a function to show source code
 
@@ -87,7 +62,7 @@ def validate_api(api):
     return False
 
 
-def run_app(api):
+def run_app():
     """
     A function to run
     the main part of the program
@@ -167,7 +142,7 @@ def run_app(api):
         params = {
             'unit_system': temp_unit,
             'fields': 'temp',
-            'apikey': api,  # TODO dynamic api input
+            'apikey': os.environ['CLIMACELL_API'],
             'lat': '',
             'lon': ''
         }
@@ -191,13 +166,15 @@ def run_app(api):
                 return response
 
         # Call for API for each row
-        cities_df['temperature'] = cities_df.apply(call, axis=1)
+        cities_df['Temperature'] = cities_df.apply(call, axis=1)
         # Create a column to resize the scatter plot dots
         cities_df['size'] = 15
+        # Rename columns
+        cities_df.rename(columns={'city_ascii': 'City'}, inplace=True)
         if 'population' in cities_df.columns:
             cities_df.drop('population', axis=True, inplace=True)
         # Check for status code
-        if '<400>' in list(cities_df['temperature']):
+        if '<400>' in list(cities_df['Temperature']):
             return 400, None
         else:
             return 200, cities_df
@@ -222,9 +199,9 @@ def run_app(api):
         # Get time for the moment
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         # Construct the figure
-        fig = px.scatter_mapbox(df, hover_data=['temperature'],
+        fig = px.scatter_mapbox(df, hover_data=['Temperature', 'City'],
                                 lat='lat', lon='lon',
-                                color='temperature', size='size',
+                                color='Temperature', size='size',
                                 color_continuous_scale=px.colors.cyclical.IceFire,
                                 zoom=zoom)
         fig.update_traces(textposition='top center')
