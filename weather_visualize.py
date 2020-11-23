@@ -17,7 +17,9 @@ import requests
 import plotly.express as px
 
 # Set Mapbox Token
-px.set_mapbox_access_token(os.environ['MAPBOX_TOKEN'])
+px.set_mapbox_access_token(
+    'pk.eyJ1IjoiaWJleG9yaWdpbiIsImEiOiJja2h0Mjc3ZHc'
+    'wNmp3MnNwNTloYTJsbHpwIn0.uXZfhBAuZ5IrutGIRMwDsw')
 
 
 # Wrapper function around the main functions with behind logic
@@ -27,26 +29,57 @@ def main():
         <h2>Choose the mode:</h2>    
     """, unsafe_allow_html=True)
     mode = st.sidebar.selectbox('', [
-        'Instructions',
+        'Instructions and code explanation',
         'Run the app',
         'Source code'
     ])
     # Create an input field for user's API
     api = st.sidebar.text_input('Please enter your Climacell API:', max_chars=32,
                                 type='password')
-    st.sidebar.markdown("<small>If you don't have one, get it "
-                        "[here](https://developer.climacell.co/sign-up). It is free."
-                        "</small>",
-                        unsafe_allow_html=True)
-    if mode == 'Instructions':
+    api_placeholder = st.sidebar.markdown("<small>If you don't have one, get it "
+                                          "[here](https://developer.climacell.co/sign-up). It is free."
+                                          "</small>",
+                                          unsafe_allow_html=True)
+
+    # not_valid = True
+    # while not_valid:
+    #     if api:  # If api is given, empty the instructions
+    #         print(api)
+    #         api_placeholder.empty()
+    #         with st.spinner('Validating your API key, little patience...'):
+    #             if validate_api(api):
+    #                 not_valid = False
+    #                 st.success('Your key is valid! Choose the \'Run app\' mode to get started')
+    #             else:
+    #                 st.error('Validation failed! Please provide a valid API key...')
+    if mode == 'Instructions and code explanation':
         pass
     elif mode == 'Run the app':
-        run_app()
+        run_app(api)
     else:
-        pass
+        pass  # TODO create a function to show source code
 
 
-def run_app():
+def validate_api(api):
+    """
+    Validates the API key by sending
+    a single request to Climacell API
+    :param api: 32-char API ket
+    :return: True if api is valid
+    """
+    endpoint = "https://api.climacell.co/v3/weather/realtime"
+    # Build sample params
+    params = {'lat': '0', 'lon': '0', 'fields': 'temp',
+              'apikey': str(api), 'unit_system': 'si'}
+    # Get response
+    response = requests.request('GET', endpoint, params=params)
+    # If successful
+    if response.status_code == 200:
+        return True
+    return False
+
+
+def run_app(api):
     """
     A function to run
     the main part of the program
@@ -128,7 +161,7 @@ def run_app():
         params = {
             'unit_system': temp_unit,
             'fields': 'temp',
-            'apikey': os.environ['CLIMACELL_API'],  # TODO dynamic api input
+            'apikey': api,  # TODO dynamic api input
             'lat': '',
             'lon': ''
         }
