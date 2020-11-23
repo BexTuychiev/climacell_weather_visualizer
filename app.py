@@ -16,9 +16,11 @@ from fuzzywuzzy import process
 import requests
 # Visualization
 import plotly.express as px
+# Import keys
+from keys import *
 
 # Set Mapbox Token
-px.set_mapbox_access_token(os.environ['MAPBOX_TOKEN'])
+px.set_mapbox_access_token(MAPBOX_TOKEN)
 
 
 # Wrapper function around the main functions with behind logic
@@ -142,7 +144,7 @@ def run_app():
         params = {
             'unit_system': temp_unit,
             'fields': 'temp',
-            'apikey': os.environ['CLIMACELL_API'],
+            'apikey': CLIMACELL_API,
             'lat': '',
             'lon': ''
         }
