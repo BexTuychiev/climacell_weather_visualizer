@@ -209,6 +209,29 @@ def run_app():
 
         return fig
 
+    def make_req(lat, lon, unit_system):
+        """
+        A vanilla function to make
+        API call based on lat, lon
+        """
+        endpoint = "https://api.climacell.co/v3/weather/realtime"
+        params = {
+            'lat': lat, 'lon': lon,
+            'fields': 'temp', 'unit_system': unit_system,
+            'apikey': os.environ['CLIMACELL_API']
+        }
+        res = requests.request("GET", endpoint, params=params)
+        response = json.loads(res.content)
+        # Build df
+        df_dict = {
+            'lat': [lat],
+            'lon': [lon],
+            'Temperature': [round(response['temp']['value'], 1)],
+            'size': [15]
+        }
+        df = pd.DataFrame(df_dict, index=[0])
+        return df
+
     # Load cities data with locations
     cities = load_data('data/worldcities.csv')
 
@@ -217,11 +240,27 @@ def run_app():
     # Create radio options for location input
     st.subheader('Choose the option to input location:')
     action = st.radio('',
-                      ['Custom Country Input', 'Choose From Dropdown'])
+                      ['Coordinate Location', 'Custom Country Input', 'Choose From Dropdown'])
     unit = st.radio('Choose the unit for temperature:',
                     ['°C', '°F'])
     # Depending on action
-    if action == 'Custom Country Input':
+    if action == 'Coordinate Location':
+        # Create two columns to insert inputs side by side
+        col1, col2 = st.beta_columns(2)
+        with col1:
+            lat = st.text_input('Latitude (lat):')
+        with col2:
+            lon = st.text_input('Longitude (lon):')
+        st.markdown('<small>If you don\'t know your coordinate '
+                    'location, go to <a href="https://www.latlong.net/">this</a> link. '
+                    '</small>',
+                    unsafe_allow_html=True)
+        # If both fields are filled
+        if lat and lon:
+            # Set zoom
+            pass
+
+    elif action == 'Custom Country Input':
         user_input = st.text_input('Enter country (basic string matching '
                                    'is enabled under the hood):', max_chars=60)
         if user_input:
