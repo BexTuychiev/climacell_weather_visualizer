@@ -36,9 +36,46 @@ def main():
     ])
     if mode == 'Instructions and code explanation':
         st.title('Visualize Weather Patterns Using Climacell')
-        image = Image.open('images/weather.jpg')
+        image = Image.open('images/gear.jpg')
         st.image(image, use_column_width=True,
                  caption='Picture by Quang Nguyen Vinh on Pexels')
+        st.markdown("""
+            Welcome to the Weather Visualizer app. Before moving on to the actual app, you may want 
+            to familiarize yourself with some instructions. When you choose the `Run App` mode, you will
+            be directed to a page like this:
+            """)
+        st.image(Image.open('images/run_app.png'), use_column_width=True)
+
+        st.markdown("""
+            To get realtime weather patterns, you should choose the method of inputting location.
+
+            The default is using a single (latitude, longitude) location and it is the best since 
+            it only makes one API call. For the input fields, you can input any unit and coordinate 
+            location and [Weather API](https://developer.climacell.co/v3/reference) fetches the 
+            results which are visualized using Plotly's `scatter_mapbox`: """)
+        st.image(Image.open('images/eiffel.png'), use_column_width=True)
+
+        st.markdown("""
+            To see the temperature, you can hover over the point on the app and zoom in, out, 
+            drag around to explore the map itself. Courtesy of Plotly.
+            
+            The next two options of location input are a little different. Custom country input 
+            takes any string for country (typos, partial names are allowed) and does a fuzzy 
+            string matching under the hood. If there is a match from `data/worldcities.csv`, 
+            `pandas` will subset the dataframe for that country taking only top <25 countries 
+            based on population size. Using each cities location, the app makes an API call 
+            and visualizes the results (it will take a while):""")
+        st.image(Image.open('images/us.png'), use_column_width=True)
+
+        st.markdown("""
+            The last option is just plain old dropdown of available countries, nothing fancy. 
+            It will visualize the results in the same way as above. I think I don't have 
+            to tell you in the last 2 methods, to visualize one country, the app makes 25 
+            API calls. It means after 4 inputs, you have to wait an hour before you can try 
+            the app again because of the hourly limit of the Weather API free plan.
+            
+            Have fun!
+        """, unsafe_allow_html=True)
     elif mode == 'Run the app':
         run_app()
     else:
