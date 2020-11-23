@@ -267,18 +267,21 @@ def run_app():
         # Create two columns to insert inputs side by side
         col1, col2 = st.beta_columns(2)
         with col1:
-            lat = st.text_input('Latitude (lat):')
+            latitude = st.text_input('Latitude (lat):')
         with col2:
-            lon = st.text_input('Longitude (lon):')
+            longitude = st.text_input('Longitude (lon):')
         st.markdown('<small>If you don\'t know your coordinate '
                     'location, go to <a href="https://www.latlong.net/">this</a> link. '
                     '</small>',
                     unsafe_allow_html=True)
         # If both fields are filled
-        if lat and lon:
-            # Set zoom
-            pass
-
+        if latitude and longitude:
+            # Call API and store as a single df
+            temp_df = make_req(latitude, longitude, {'°C': 'us', '°F': 'si'}[unit])
+            # Plot a single point
+            plot = plot_single(temp_df)
+            # Display as plotly chart
+            st.plotly_chart(plot)
     elif action == 'Custom Country Input':
         user_input = st.text_input('Enter country (basic string matching '
                                    'is enabled under the hood):', max_chars=60)
