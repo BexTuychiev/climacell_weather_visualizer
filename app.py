@@ -220,7 +220,7 @@ def run_app():
         params = {
             'lat': lat, 'lon': lon,
             'fields': 'temp', 'unit_system': unit_system,
-            'apikey': os.environ['CLIMACELL_API']
+            'apikey': CLIMACELL_API
         }
         res = requests.request("GET", endpoint, params=params)
         response = json.loads(res.content)
