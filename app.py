@@ -85,9 +85,6 @@ def main():
             from github repo using path
             :param path: path to the file
             :return: file object
-
-            Implemented from demo Streamlit project:
-            https://share.streamlit.io/streamlit/demo-self-driving
             """
             with open(path, 'rb') as file:
                 data = file.read().decode('utf-8')
