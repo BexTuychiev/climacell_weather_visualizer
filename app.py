@@ -287,16 +287,20 @@ def run_app():
             'apikey': CLIMACELL_API
         }
         res = requests.request("GET", endpoint, params=params)
-        response = json.loads(res.content)
-        # Build df
-        df_dict = {
-            'lat': [lat],
-            'lon': [lon],
-            'Temperature': [round(response['temp']['value'], 1)],
-            'size': [15]
-        }
-        df = pd.DataFrame(df_dict, index=[0])
-        return df
+        # If successful
+        if res.status_code == 200:
+            response = json.loads(res.content)
+            # Build df
+            df_dict = {
+                'lat': [lat],
+                'lon': [lon],
+                'Temperature': [round(response['temp']['value'], 1)],
+                'size': [15]
+            }
+            df = pd.DataFrame(df_dict, index=[0])
+        else:  # set df to none if other status codes
+            df = None
+        return df, res.status_code
 
     def plot_single(df):
         """
@@ -347,13 +351,18 @@ def run_app():
         # If both fields are filled
         if latitude and longitude:
             # Call API and store as a single df
-            temp_df = make_req(latitude, longitude, {'°C': 'si', '°F': 'us'}[unit])
-            # Plot a single point
-            plot = plot_single(temp_df)
-            # Display dataframe too
-            st.table(temp_df[['lat', 'lon', 'Temperature']])
-            # Display as plotly chart
-            st.plotly_chart(plot)
+            temp_df, status_code = make_req(latitude, longitude, {'°C': 'si', '°F': 'us'}[unit])
+            if status_code == 200:
+                # Plot a single point
+                plot = plot_single(temp_df)
+                # Display dataframe too
+                st.table(temp_df[['lat', 'lon', 'Temperature']])
+                # Display as plotly chart
+                st.plotly_chart(plot)
+            elif status_code == 400:
+                st.error('Invalid coordinates. Please try again!')
+            else:
+                st.error('Too many requests. Please try again in an hour...')
     elif action == 'Custom Country Input':
         user_input = st.text_input('Enter country (basic string matching '
                                    'is enabled under the hood):', max_chars=60)
