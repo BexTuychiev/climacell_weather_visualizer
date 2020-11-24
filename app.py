@@ -35,10 +35,13 @@ def main():
         'Source code'
     ])
     if mode == 'Instructions and code explanation':
+        # Set a title
         st.title('Visualize Weather Patterns Using Climacell')
+        # Set a preview image
         image = Image.open('images/gear.jpg')
         st.image(image, use_column_width=True,
                  caption='Picture by Quang Nguyen Vinh on Pexels')
+
         st.markdown("""
             Welcome to the Weather Visualizer app. Before moving on to the actual app, you may want 
             to familiarize yourself with some instructions. When you choose the `Run App` mode, you will
@@ -76,9 +79,12 @@ def main():
             
             Have fun!
         """, unsafe_allow_html=True)
+
     elif mode == 'Run the app':
         run_app()
+
     else:
+        # A function to get contents of files in string
         def get_file_content_as_string(path):
             """
             A function to download files
@@ -89,6 +95,8 @@ def main():
             with open(path, 'rb') as file:
                 data = file.read().decode('utf-8')
             return data
+
+        # Display the contents of the main app in code
         st.code(get_file_content_as_string('app.py'))
 
 
@@ -295,8 +303,11 @@ def run_app():
                                 size='size',
                                 color_continuous_scale=px.colors.cyclical.IceFire,
                                 zoom=14)
+        # Align text to the center
         fig.update_traces(textposition='top center')
-        fig.update_layout(title_text=f'Temperatures for {now}, at ({df["lat"][0]}, {df["lon"][0]})', title_x=0.5)
+        # Set title to the plot
+        fig.update_layout(title_text=f'Temperatures for {now}, at ({df["lat"][0]},'
+                                     f' {df["lon"][0]})', title_x=0.5)
 
         return fig
 
@@ -315,10 +326,11 @@ def run_app():
     if action == 'Coordinate Location':
         # Create two columns to insert inputs side by side
         col1, col2 = st.beta_columns(2)
-        with col1:
+        with col1:  # latitude input
             latitude = st.text_input('Latitude (lat):')
-        with col2:
+        with col2:  # longitude input
             longitude = st.text_input('Longitude (lon):')
+        # Leave instructions to get the coords
         st.markdown('<small>If you don\'t know your coordinate '
                     'location, go to <a href="https://www.latlong.net/">this</a> link. '
                     '</small>',
@@ -352,7 +364,7 @@ def run_app():
                 # If request successful
                 if status == 200:
                     # Show dataframe
-                    st.dataframe(temperatures.drop('size', axis=1))
+                    st.dataframe(temperatures.drop('size', axis=1))  # TODO add a df toggler
                     # Create a waiting event while plotting
                     with st.spinner("Little more... Plotting the results..."):
                         # Inform the user to hover over points
@@ -380,7 +392,7 @@ def run_app():
             # If request successful
             if status == 200:
                 # Show dataframe
-                st.dataframe(temperatures.drop('size', axis=1))
+                st.dataframe(temperatures.drop('size', axis=1))  # TODO add a df toggler
                 # Create a waiting event while plotting
                 with st.spinner("Little more... Plotting the results..."):
                     # Inform the user to hover over points
