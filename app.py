@@ -47,6 +47,10 @@ def main():
             to familiarize yourself with some instructions. When you choose the `Run App` mode, you will
             be directed to a page like this:
             """)
+        st.markdown(">The instructions and extra code explanations can also be found on "
+                    "[this](https://towardsdatascience.com/building-production"
+                    "-level-weather-visualizer-app-in-a-day-e360a68116c7?source"
+                    "=your_stories_page-------------------------------------) Medium article.")
         st.image(Image.open('images/run_app.png'), use_column_width=True)
 
         st.markdown("""
