@@ -88,6 +88,11 @@ def main():
         run_app()
 
     else:
+        st.markdown("The instructions and extra code explanations can also be found on "
+                    "[this](https://towardsdatascience.com/building-production"
+                    "-level-weather-visualizer-app-in-a-day-e360a68116c7?source"
+                    "=your_stories_page-------------------------------------) Medium article.")
+
         # A function to get contents of files in string
         def get_file_content_as_string(path):
             """
