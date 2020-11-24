@@ -1,3 +1,4 @@
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/bextuychiev/climacell_weather_visualizer/app.py)
 # Building production-level weather visualizer app in a day
 <img src='images/gear.jpg'></img>
 <figcaption style="text-align: center;">
